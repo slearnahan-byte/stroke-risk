@@ -26,10 +26,10 @@ Hypertension
 History of Heart Disease
 Stroke history (target variable)
 
-'01_stroke_cleaning.sas`  
+`01_stroke_cleaning.sas` 
 Cleans and preprocesses the raw dataset, including handling missing values and recoding variables.
 
-`02_stroke_eda.sas`  
+`02_stroke_eda.sas` 
 Performs exploratory data analysis, including summary statistics and visualizations.
 
 `03_stroke_modeling.sas`  
