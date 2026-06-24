@@ -2,7 +2,7 @@
  * Program: 01_stroke_cleaning.sas
  * Project: Healthcare Stroke Risk Analysis
  * Author: Sophia L.
- * Last Updated: 2026-06-02
+ * Last Updated: 2026-06-24
  *
  * Purpose:
  * 	Import the healthcare stroke dataset, assign variable names,
@@ -62,7 +62,7 @@ PROC FREQ;
 RUN;
 
 /**************************************************************************
- * SECTION 4: CREATE CLEAN ANALYSIS DATASET
+ * SECTION 4: CREATE A CLEAN ANALYSIS DATASET
  **************************************************************************/
 PROC MEANS MEDIAN;
 	VAR bmi;
