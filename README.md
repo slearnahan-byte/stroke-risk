@@ -32,5 +32,4 @@ Cleans and preprocesses the raw dataset, including handling missing values and r
 `02_stroke_eda.sas` 
 Performs exploratory data analysis, including summary statistics and visualizations.
 
-`03_stroke_modeling.sas`  
-Builds and evaluates logistic regression models to predict stroke risk.
+`03_stroke_modeling.sas`  Builds and evaluates logistic regression models to predict stroke risk.
