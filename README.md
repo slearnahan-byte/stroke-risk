@@ -7,7 +7,8 @@ The goal is to:
 
 Clean and prepare survey data in SAS
 Provide descriptive statistics to explore relationships between health indicators and stroke
-Build diagnostic/predictive logistic regression models to identify key risk factors
+
+Future work: Build diagnostic/predictive logistic regression models to identify key risk factors
 
 Dataset
 Source: Kaggle (public dataset)
@@ -32,4 +33,4 @@ Cleans and preprocesses the raw dataset, including handling missing values and r
 `02_stroke_eda.sas` 
 Performs exploratory data analysis, including summary statistics and visualizations.
 
-`03_stroke_modeling.sas`  Builds and evaluates logistic regression models to predict stroke risk.
+`03_stroke_feature_eng.sas`  transforms existing variables into model-ready features for further descriptive, diagnostic, and predictive analysis of stroke risk.
