@@ -60,8 +60,8 @@ DATA stroke_model;
    log_bmi  =  log(bmi);
 	
 	LABEL 
-		log_bmi  =  "Log-transformed BMI";
-		bmi_cat  =  "BMI Clinical Category";
+		log_bmi  =  "Log-transformed BMI"
+		bmi_cat  =  "BMI Clinical Category"
 		diabetes_cat  =  "Glycemic Risk Category";
 RUN;
 
