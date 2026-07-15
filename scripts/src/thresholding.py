@@ -22,11 +22,13 @@ Purpose: Utility functions for selecting and evaluating probability classificati
         predicted probabilities.
 """
 
+import numpy as np
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import (
     confusion_matrix,
     recall_score,
-    precision_score
+    precision_score,
+    fbeta_score
 )
 
 def threshold_analysis(
