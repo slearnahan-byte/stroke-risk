@@ -30,6 +30,7 @@ from sklearn.metrics import (
     precision_score,
     fbeta_score
 )
+
 def threshold_analysis(
     model,
     X_train,
@@ -60,42 +61,45 @@ def threshold_analysis(
      cv=cv,
      method="predict_proba",
      n_jobs=-1
- )[:,1] 
- 
- # Create candidate thresholds. Searching high to low identifies the most 
+ )[:,1]
+
+ # Create candidate thresholds. Searching high to low identifies the most
  # conservative thresholds that meets the recall requirement
   thresholds = np.arange(1.0, 0.0, -step)
-  
+
   selected_threshold = None
-  
+
   # Select highest threshold achieving target recall
-  
+
   for threshold in thresholds:
     # Convert probabilities into binary predictions based
     # on the current threshold
     threshold_pred = (cv_prob >= threshold).astype(int)
-    
+
     # Stop searching once the target recall requirement is met
     if recall_score(y_train, threshold_pred) >= target_recall:
       selected_threshold = threshold
       break
-    
+
   if selected_threshold is None:
     return None
-      
+
   print(selected_threshold)
-  
+
   # Apply selected threshold to test probabilities
   y_pred = (y_prob >= selected_threshold).astype(int)
 
   cm = confusion_matrix(y_test, y_pred)
 
+  # Summary metrics used for model comparison
+  metrics = {
+      'Recall': recall_score(y_test, y_pred),
+      'Precision': precision_score(y_test, y_pred),
+      'f2': fbeta_score(y_test, y_pred, beta=2}
+
   # Display summary metrics
-  print(
-      recall_score(y_test, y_pred),
-      precision_score(y_test, y_pred),
-      fbeta_score(y_test, y_pred, beta=2))
-  
+  print(metrics)
+
   # Summarize threshold performance
   return {
       'recall': recall_score(y_test, y_pred),
