@@ -95,7 +95,7 @@ def threshold_analysis(
   metrics = {
       'Recall': recall_score(y_test, y_pred),
       'Precision': precision_score(y_test, y_pred),
-      'f2': fbeta_score(y_test, y_pred, beta=2}
+      'f2': fbeta_score(y_test, y_pred, beta=2)}
 
   # Display summary metrics
   print(metrics)
