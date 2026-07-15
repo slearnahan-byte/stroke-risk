@@ -30,7 +30,6 @@ from sklearn.metrics import (
     precision_score,
     fbeta_score
 )
-
 def threshold_analysis(
     model,
     X_train,
@@ -93,9 +92,9 @@ def threshold_analysis(
 
   # Display summary metrics
   print(
-      recall_score(y_train, y_pred),
-      precision_score(y_train, y_pred),
-      fbeta_score(y_test, threshold_pred, beta=2))
+      recall_score(y_test, y_pred),
+      precision_score(y_test, y_pred),
+      fbeta_score(y_test, y_pred, beta=2))
   
   # Summarize threshold performance
   return {
@@ -105,5 +104,4 @@ def threshold_analysis(
       'threshold': selected_threshold,
       'y_pred': y_pred,
       'cm': cm
-  }
   }
