@@ -35,7 +35,6 @@ def threshold_analysis(
     y_train,
     y_test,
     y_prob,
-    y_test,
     cv,
     target_recall,
     step=0.01
