@@ -30,7 +30,6 @@ from sklearn.metrics import (
     precision_score,
     fbeta_score
 )
-
 def threshold_analysis(
     model,
     X_train,
@@ -48,7 +47,7 @@ def threshold_analysis(
   Uses out-of-fold cross-validated predicted probabilities from the training
   data to avoid selecting a threshold based on a single fitted model.
 
-  Returns selected threshold, precision, recall, f2, the confusion matrix,
+  Returns all qualifyings threshold, precision, recall, f2, the confusion matrix,
   and predicted classes.
   """
 
@@ -68,44 +67,46 @@ def threshold_analysis(
   thresholds = np.arange(1.0, 0.0, -step)
 
   selected_threshold = None
+  qualifying_results = [] # Initialize list to store all qualifying thresholds
 
-  # Select highest threshold achieving target recall
 
   for threshold in thresholds:
     # Convert probabilities into binary predictions based
     # on the current threshold
     threshold_pred = (cv_prob >= threshold).astype(int)
 
-    # Stop searching once the target recall requirement is met
+    # Check if the target recall requirement is met
     if recall_score(y_train, threshold_pred) >= target_recall:
-      selected_threshold = threshold
-      break
+      qualifying_results.append({
+          'threshold': threshold,
+          'recall': recall_score(y_train, threshold_pred),
+          'precision': precision_score(y_train, threshold_pred, zero_division=0),
+          'f2': fbeta_score(y_train, threshold_pred, beta=2, zero_division=0)
+      }) # Collect all qualifying thresholds
 
-  if selected_threshold is None:
+  if len(qualifying_results) == 0:
+    print(f"No threshold found that achieves a recall of {target_recall} or above.")
     return None
 
-  print(selected_threshold)
+  best_threshold_result = max(
+      qualifying_results,
+      key=lambda x: x["f2"]
+)
+  selected_threshold = best_threshold_result["threshold"]
+
+  # Print selected threshold and summary
+  print(best_threshold_result)
 
   # Apply selected threshold to test probabilities
   y_pred = (y_prob >= selected_threshold).astype(int)
 
   cm = confusion_matrix(y_test, y_pred)
 
-  # Summary metrics used for model comparison
-  metrics = {
-      'Recall': recall_score(y_test, y_pred),
-      'Precision': precision_score(y_test, y_pred),
-      'f2': fbeta_score(y_test, y_pred, beta=2)}
-
-  # Display summary metrics
-  print(metrics)
-
   # Summarize threshold performance
   return {
-      'recall': recall_score(y_test, y_pred),
-      'precision': precision_score(y_test, y_pred),
-      'f2' : fbeta_score(y_test, y_pred, beta=2),
-      'threshold': selected_threshold,
+      'results': qualifying_results,
+      'selected_threshold': selected_threshold,
+      'best_result': best_threshold_result,
       'y_pred': y_pred,
       'cm': cm
   }
