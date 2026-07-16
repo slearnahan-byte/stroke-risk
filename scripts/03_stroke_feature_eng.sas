@@ -46,7 +46,7 @@ DATA stroke_model;
 	ELSE IF bmi < 40 THEN
 		bmi_cat = "Obesity II";
 	ELSE
-		bmi_cat = "Severe Obesity";
+		bmi_cat = "Obesity III";
 
 	IF avg_glucose_level < = 117 THEN
 		diabetes_cat = "Normal";
