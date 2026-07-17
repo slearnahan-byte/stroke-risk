@@ -2,7 +2,7 @@
 * Program: 02_stroke_eda.sas
 * Project: Healthcare Stroke Risk Analysis
 * Author: Sophia L.
-* Last Updated: 2026-06-28
+* Last Updated: 2026-07-17
 *
 * Purpose:
 * 	Perform exploratory data analysis (EDA) on the stroke dataset to
@@ -24,11 +24,38 @@
 **************************************************************************/
 
 PROC IMPORT 
-	OUT=stroke_data
+	OUT = stroke_data
 	/* first EDA iteration used ... /01_stroke_clean.csv */
-	DATAFILE="/home/u63931017/DataFiles/stroke_model.csv" 
-	DBMS=CSV REPLACE;
-	GETNAMES=yes;
+	DATAFILE = "/home/u63931017/DataFiles/stroke_model.csv" 
+	DBMS = CSV REPLACE;
+	GETNAMES = yes;
+	GUESSINGROWS = max;
+RUN;
+
+DATA stroke_data;
+    SET stroke_data;
+
+    IF stroke = "Yes" THEN stroke_num = 1;
+    ELSE IF stroke = "No" THEN stroke_num = 0;
+RUN;
+
+DATA stroke_data_ordered;
+    SET stroke_data;
+
+    IF bmi_cat = "Underweight" THEN bmi_order = 1;
+    ELSE IF bmi_cat = "Normal" THEN bmi_order = 2;
+    ELSE IF bmi_cat = "Overweight" THEN bmi_order = 3;
+    ELSE IF bmi_cat = "Obesity I" THEN bmi_order = 4;
+    ELSE IF bmi_cat = "Obesity II" THEN bmi_order = 5;
+    ELSE IF bmi_cat = "Obesity III" THEN bmi_order = 6;
+RUN;
+
+DATA stroke_data_ordered;
+    SET stroke_data_ordered;
+
+    IF diabetes_cat = "Normal" THEN diabetes_order = 1;
+    ELSE IF diabetes_cat = "Prediabetes" THEN diabetes_order = 2;
+    ELSE IF diabetes_cat = "Diabetes" THEN diabetes_order = 3;
 RUN;
 
 /**************************************************************************
@@ -37,12 +64,12 @@ RUN;
 
 /* 2.1 DESCRIPTIVE STATISTICS */
 
-PROC MEANS DATA=stroke_data n nmiss mean std min p25 median p75 max;
+PROC MEANS DATA = stroke_data n nmiss mean std min p25 median p75 max;
 	VAR 
 		age bmi log_bmi avg_glucose_level;
 RUN;
 
-PROC FREQ DATA=stroke_data;
+PROC FREQ DATA = stroke_data;
 	TABLES 
 		gender ever_married residence_type smoking_status hypertension 
 		heart_disease diabetes_cat bmi_cat stroke / MISSING;
@@ -55,37 +82,37 @@ RUN;
 
 /* 2.2 VISUAL ASSESSMENT*/
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Distribution of Patient Age";
     HISTOGRAM age;
     DENSITY age;
-    DENSITY age / TYPE = KERNEL LINEATTRS = (COLOR = red PATTERN=DASH);
+    DENSITY age / TYPE = KERNEL LINEATTRS = (COLOR = red PATTERN = DASH);
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Distribution of Body Mass Index (BMI)";
     HISTOGRAM bmi;
     DENSITY bmi;
-    DENSITY bmi / TYPE = KERNEL LINEATTRS = (COLOR = red PATTERN=DASH);
+    DENSITY bmi / TYPE = KERNEL LINEATTRS = (COLOR = red PATTERN = DASH);
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Distribution of Logarithmic Body Mass Index (BMI)";
     HISTOGRAM log_bmi;
     DENSITY log_bmi;
-    DENSITY log_bmi / TYPE = KERNEL LINEATTRS = (COLOR = red PATTERN=DASH);
+    DENSITY log_bmi / TYPE = KERNEL LINEATTRS = (COLOR = red PATTERN = DASH);
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Distribution of Average Glucose Levels (mg/dL)";
     HISTOGRAM avg_glucose_level;
     DENSITY avg_glucose_level;
-    DENSITY avg_glucose_level / TYPE = KERNEL LINEATTRS = (COLOR = red PATTERN=DASH);
+    DENSITY avg_glucose_level / TYPE = KERNEL LINEATTRS = (COLOR = red PATTERN = DASH);
 RUN;
 
 %macro univariate_bar(var);
 
-	PROC SGPLOT DATA=stroke_data;
+	PROC SGPLOT DATA = stroke_data;
     	TITLE "Frequency Distribution of %upcase($var)";
     	VBAR &var;
 	RUN;
@@ -111,10 +138,10 @@ Insight:
    Average Glucose: Clear non-normal pattern, bimodal - 
    		consider categorical representation of avg. glucose (diabetes_cat created in feature eng)*/
 
-PROC UNIVARIATE DATA=stroke_data NORMAL;
+PROC UNIVARIATE DATA = stroke_data NORMAL;
     TITLE "Normality Tests for Continuous Variables";
     VAR age log_bmi bmi avg_glucose_level;
-    QQPLOT age log_bmi bmi avg_glucose_level / NORMAL(MU=EST SIGMA=EST);
+    QQPLOT age log_bmi bmi avg_glucose_level / NORMAL(MU = EST SIGMA = EST);
 RUN;
 
 /* 2.4 IDENTIFY POTENTIAL OUTLIERS 
@@ -128,22 +155,22 @@ Insight:
  and reflect the right-skewed distributions rather than obvious data-entry errors.
 */
 
-PROC SGPLOT DATA=stroke_data; 
+PROC SGPLOT DATA = stroke_data; 
     TITLE "Age Distribution & Outliers";
     VBOX age;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "BMI Distribution & Outliers";
     VBOX bmi;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Log(BMI) Distribution & Outliers";
     VBOX log_bmi;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Average Glucose Distribution & Outliers";
     VBOX avg_glucose_level;
 RUN;
@@ -154,67 +181,67 @@ RUN;
 
 /* 3.1 VISUAL ASSESSMENT */
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Distribution of Patient Age by Stroke Outcome";
-    HISTOGRAM age / GROUP = stroke TRANSPARENCY=0.5;
+    HISTOGRAM age / GROUP = stroke TRANSPARENCY = 0.5;
     DENSITY age;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Distribution of Body Mass Index (BMI) by Stroke Outcome";
-    HISTOGRAM bmi / GROUP = stroke TRANSPARENCY=0.5;
+    HISTOGRAM bmi / GROUP = stroke TRANSPARENCY = 0.5;
     DENSITY bmi;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Distribution of Logarithmic Body Mass Index (BMI) by Stroke Outcome";
-    HISTOGRAM log_bmi / GROUP = stroke TRANSPARENCY=0.5;
+    HISTOGRAM log_bmi / GROUP = stroke TRANSPARENCY = 0.5;
     DENSITY log_bmi;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Distribution of Average Glucose Levels (mg/dL) by Stroke Outcome";
-    HISTOGRAM avg_glucose_level / GROUP = stroke TRANSPARENCY=0.5;
+    HISTOGRAM avg_glucose_level / GROUP = stroke TRANSPARENCY = 0.5;
     DENSITY avg_glucose_level;
 RUN;
 
-PROC SGPLOT DATA=stroke_data; 
+PROC SGPLOT DATA = stroke_data; 
     TITLE "Age Distribution & Outliers by Stroke Outcome";
-    VBOX age / GROUP=stroke;
+    VBOX age / GROUP = stroke;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "BMI Distribution & Outliers by Stroke Outcome";
-    VBOX bmi / GROUP=stroke;
+    VBOX bmi / GROUP = stroke;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Log(BMI) Distribution & Outliers by Stroke Outcome";
-    VBOX log_bmi / GROUP=stroke;
+    VBOX log_bmi / GROUP = stroke;
 RUN;
 
-PROC SGPLOT DATA=stroke_data;
+PROC SGPLOT DATA = stroke_data;
     TITLE "Average Glucose Distribution & Outliers by Stroke Outcome";
-    VBOX avg_glucose_level / GROUP=stroke;
+    VBOX avg_glucose_level / GROUP = stroke;
 RUN;
 
 %macro bivariate_bar(var);
 
 	/* Frequency cross-tabulation with target variable */
-	PROC FREQ DATA=stroke_data NOPRINT;
-    	TABLES &var.*stroke / OUT=temp_&var;
+	PROC FREQ DATA = stroke_data NOPRINT;
+    	TABLES &var.*stroke / OUT = temp_&var;
 	RUN;
 
 	/* Calculate total observations per predictor category */
-	PROC MEANS DATA=temp_&var NOPRINT;
+	PROC MEANS DATA = temp_&var NOPRINT;
     	CLASS &var;
     	VAR count;
-    	OUTPUT OUT=totals_&var SUM(count)=total;
+    	OUTPUT OUT = totals_&var SUM(count) = total;
 	RUN;
 
 	/* Sort datasets before merging */
-	PROC SORT DATA=temp_&var; BY &var; RUN;
-	PROC SORT DATA=totals_&var; BY &var; RUN;
+	PROC SORT DATA = temp_&var; BY &var; RUN;
+	PROC SORT DATA = totals_&var; BY &var; RUN;
 
 	/* Merge counts with totals and compute proportions */
 	DATA prop_&var;
@@ -225,14 +252,14 @@ RUN;
 	RUN;
 
 	/* Visualize stroke distribution within each predictor group */
-	PROC SGPLOT DATA=prop_&var;
+	PROC SGPLOT DATA = prop_&var;
     	TITLE "Stroke Distribution by &var";
     	VBAR &var /
-        	RESPONSE=prop
-        	GROUP=stroke
-        	GROUPDISPLAY=stack;
+        	RESPONSE = prop
+        	GROUP = stroke
+        	GROUPDISPLAY = stack;
 
-    	YAXIS LABEL="Proportion within %upcase(&var)";
+    	YAXIS LABEL = "Proportion within %upcase(&var)";
 	RUN;
 
 %mend;
@@ -252,7 +279,7 @@ RUN;
    H0: Stochastic equality between stroke and non-stroke groups */
 ODS SELECT WilcoxonScores WilcoxonTest;
 TITLE "Continuous Variables*Stroke";
-PROC NPAR1WAY DATA=stroke_data WILCOXON;
+PROC NPAR1WAY DATA = stroke_data WILCOXON;
     CLASS stroke;
     VAR age bmi log_bmi avg_glucose_level;
 RUN;
@@ -270,12 +297,12 @@ RUN;
    stroke outcome is independent of the predictor.*/
 ODS SELECT ChiSq;
 TITLE "Categorical Variables*Stroke";
-PROC FREQ DATA=stroke_data;
+PROC FREQ DATA = stroke_data;
 	WHERE gender ne "Other";
 	TABLES gender*stroke / CHISQ;
 RUN;
 
-PROC FREQ DATA=stroke_data;
+PROC FREQ DATA = stroke_data;
 	TABLES
 	    ever_married*stroke
 	    residence_type*stroke
@@ -286,12 +313,77 @@ PROC FREQ DATA=stroke_data;
     	bmi_cat*stroke / CHISQ;
 RUN;
 
+/* 3.3 Feature Representation Assessment */
+
+/* BMI - Evaluating the raw BMI original continuous measurement, 
+   log(BMI) created to address right-skewness,
+   and BMI categories apply WHO clinical thresholds to capture nonlinear risk patterns. */
+  
+PROC SORT DATA = stroke_data_ordered;
+    BY bmi_order;
+RUN;
+
+PROC SGPLOT DATA = stroke_data_ordered;
+    TITLE "Stroke Rate Across BMI Categories";
+    VBAR bmi_cat /
+        RESPONSE = stroke_num
+        STAT = MEAN;
+    
+    XAXIS DISCRETEORDER=data FITPOLICY=stagger;
+    YAXIS LABEL = "Stroke Proportion";
+RUN;
+
+
+PROC SGPLOT DATA = stroke_data;
+    TITLE "Relationship Between BMI and Stroke Outcome";
+    VBOX bmi / GROUP = stroke;
+RUN;
+
+
+PROC SGPLOT DATA = stroke_data;
+    TITLE "Relationship Between Log(BMI) and Stroke Outcome";
+    VBOX log_bmi / GROUP = stroke;
+RUN;
+
+OPTIONS LINESIZE = 180;
+PROC FREQ DATA = stroke_data_ordered ORDER = data;
+    TABLES bmi_cat*stroke;
+RUN;
+
+/* Glucose - Evaluate raw glucose original continuous measurement,
+   and diabetes categories to provide clinically interpretable results. */
+
+PROC SORT DATA = stroke_data_ordered;
+    BY diabetes_order;
+RUN;
+
+Proc SGPLOT DATA = stroke_data;
+    TITLE "Stroke Rate Across Diabetes Categories";
+    VBAR diabetes_cat /
+        RESPONSE = stroke_num
+        STAT = MEAN;
+
+    XAXIS DISCRETEORDER=data FITPOLICY=stagger;
+    YAXIS LABEL = "Stroke Proportion";
+RUN;
+
+
+PROC SGPLOT DATA = stroke_data;
+    TITLE "Relationship Between Average Glucose and Stroke Outcome";
+    VBOX avg_glucose_level / GROUP = stroke;
+RUN;
+
+PROC FREQ DATA = stroke_data_ordered ORDER = data;
+    TABLES diabetes_cat*stroke;
+RUN;
+
+
 /************************************************************************** 
 * SECTION 4: CHECK FOR MULTICOLLINEARITY 
 **************************************************************************/ 
 TITLE "Continuous-Continuous Multicolinearity"; 
 PROC SGSCATTER DATA = stroke_data;
-	MATRIX age bmi log_bmi avg_glucose_level / DIAGONAL=(histogram KERNEL NORMAL);
+	MATRIX age bmi log_bmi avg_glucose_level / DIAGONAL = (histogram KERNEL NORMAL);
 RUN;
 
 
@@ -302,7 +394,7 @@ PROC CORR DATA = stroke_data SPEARMAN NOSIMPLE;
 RUN; 
 
 DATA HeatMapData;
-	SET MySpearmanMatrix(RENAME = (variable=RowName));
+	SET MySpearmanMatrix(RENAME = (variable = RowName));
 	ARRAY cols[*] age bmi avg_glucose_level;
 	DO i = 1 to dim(cols);
 		ColName = vname(cols[i]);
@@ -325,7 +417,7 @@ RUN;
 TITLE "Categorical-Categorical Multicolinearity"; 
 ODS SELECT ChiSq;
 TITLE "Categorical-Categorical Multicolinearity"; 
-PROC FREQ DATA=stroke_data;
+PROC FREQ DATA = stroke_data;
 	WHERE gender ne "Other";
 	TABLES 
 		gender*ever_married 
@@ -478,7 +570,7 @@ Categorical Variables (Chi-square Test):
 Key Findings:
 
 	- Age is a central variable, showing moderate associations with BMI 
-	  and a strong association with ever_married, suggesting that marital status likely acts as a proxy for age.
+	  and strong association with ever_married, suggesting that marital status likely acts as a proxy for age.
 
 	- No meaningful relationships were observed between residence type and other variables, indicating limited relevance for stroke prediction.
 	  Somewhat unexpected given known urban-rural health disparities.
