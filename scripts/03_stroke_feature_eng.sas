@@ -2,7 +2,7 @@
 * Program: 03_stroke_feature_eng.sas
 * Project: Healthcare Stroke Risk Analysis
 * Author: Sophia L.
-* Last Updated: 2026-06-28
+* Last Updated: 2026-07-17
 *
 * Purpose:
 * 	To transform the cleaned stroke dataset into a model-ready analytic dataset by creating clinically 
@@ -30,7 +30,7 @@ RUN;
 
 DATA stroke_model;
 	SET stroke_clean;
-	LENGTH bmi_cat $20 diabetes_cat $20;
+	LENGTH bmi_cat $25 diabetes_cat $25;
 
 /* CREATE CLINICALLY MEANINGFUL CATEGORIES FOR BMI AND GLUCOSE
    BASED ON CLINICALLY DEFINED THRESHOLDS */
@@ -48,9 +48,9 @@ DATA stroke_model;
 	ELSE
 		bmi_cat = "Obesity III";
 
-	IF avg_glucose_level < = 117 THEN
+	IF avg_glucose_level <= 117 THEN
 		diabetes_cat = "Normal";
-	ELSE IF avg_glucose_level < = 154 THEN
+	ELSE IF avg_glucose_level <= 154 THEN
 		diabetes_cat = "Prediabetes";
 	ELSE
 		diabetes_cat = "Diabetes";
@@ -60,9 +60,9 @@ DATA stroke_model;
    log_bmi  =  log(bmi);
 	
 	LABEL 
-		log_bmi  =  "Log-transformed BMI"
-		bmi_cat  =  "BMI Clinical Category"
-		diabetes_cat  =  "Glycemic Risk Category";
+		log_bmi = "Log-transformed BMI"
+		bmi_cat = "BMI Clinical Category"
+		diabetes_cat = "Glycemic Risk Category";
 RUN;
 
 
