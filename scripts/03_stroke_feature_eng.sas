@@ -2,7 +2,7 @@
 * Program: 03_stroke_feature_eng.sas
 * Project: Healthcare Stroke Risk Analysis
 * Author: Sophia L.
-* Last Updated: 2026-07-17
+* Last Updated: 2026-06-28
 *
 * Purpose:
 * 	To transform the cleaned stroke dataset into a model-ready analytic dataset by creating clinically 
@@ -34,8 +34,10 @@ DATA stroke_model;
 
 /* CREATE CLINICALLY MEANINGFUL CATEGORIES FOR BMI AND GLUCOSE
    BASED ON CLINICALLY DEFINED THRESHOLDS */
- 
-	IF bmi < 18.5 THEN
+ 	
+ 	IF bmi_missing = "Yes" THEN
+    	bmi_cat = "Missing";
+	ELSE IF bmi < 18.5 THEN
 		bmi_cat = "Underweight";
 	ELSE IF bmi < 25 THEN
 		bmi_cat = "Normal";
@@ -45,9 +47,9 @@ DATA stroke_model;
 		bmi_cat = "Obesity I";
 	ELSE IF bmi < 40 THEN
 		bmi_cat = "Obesity II";
-	ELSE
+	ELSE 
 		bmi_cat = "Obesity III";
-
+	
 	IF avg_glucose_level <= 117 THEN
 		diabetes_cat = "Normal";
 	ELSE IF avg_glucose_level <= 154 THEN
