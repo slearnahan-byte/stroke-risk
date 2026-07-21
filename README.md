@@ -74,16 +74,18 @@ Interpretability analysis included:
 
 ## Repository Structure
 
+```text
 stroke-risk/
-│
+|
 ├── notebooks/
-│ ├── 01_cleaning.ipynb
-│ ├── 02_eda.ipynb
-│ ├── 03_feature_engineering.ipynb
-│ └── 04_stroke_models.ipynb
-│
+│   ├── 01_cleaning.ipynb
+│   ├── 02_eda.ipynb
+│   ├── 03_feature_engineering.ipynb
+│   └── 04_stroke_models.ipynb
+|
 ├── data/
 ├── models/
 ├── src/
 ├── requirements.txt
 └── README.md
+```
